@@ -1,2 +1,2 @@
 # miLab_nitai
-miLab course repos
+miLab course repoS
