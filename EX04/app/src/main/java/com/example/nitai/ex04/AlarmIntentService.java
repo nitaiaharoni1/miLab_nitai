@@ -3,23 +3,43 @@ package com.example.nitai.ex04;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.util.Log;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class AlarmIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.example.nitai.ex04.action.FOO";
-    private static final String ACTION_BAZ = "com.example.nitai.ex04.action.BAZ";
+    private static final String ACTION_ALARM = "com.example.nitai.ex4_1.action.ALARM";
+    private static final String EXTRA_PARAM_RECEIVER = "com.example.nitai.ex4_1.extra.PARAM_RECEIVER";
+    public static final String EXTRA_PARAM_RESULT_STRING = "com.example.nitai.ex4_1.extra.PARAM_RESULT_STRING";
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.example.nitai.ex04.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.example.nitai.ex04.extra.PARAM2";
+    private Set<String> quotes;
+
+    public AlarmIntentService() {
+        super("AlarmIntentService");
+        this.quotes = new HashSet<String>();
+        quotes.add("a");
+        quotes.add("b");
+        quotes.add("c");
+        quotes.add("d");
+        quotes.add("e");
+        quotes.add("f");
+    }
+
+    public static String getActionAlarm() {
+        return ACTION_ALARM;
+    }
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -28,64 +48,44 @@ public class AlarmIntentService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
+    public static void startActionAlarm(Context context, ResultReceiver resultReceiver) {
         Intent intent = new Intent(context, AlarmIntentService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(ACTION_ALARM);
+        intent.putExtra(EXTRA_PARAM_RECEIVER, resultReceiver);
         context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, AlarmIntentService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    public AlarmIntentService() {
-        super("AlarmIntentService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+            if (ACTION_ALARM.equals(action)) {
+                final ResultReceiver receiver = intent.getParcelableExtra(EXTRA_PARAM_RECEIVER);
+                handleActionAlarm(receiver);
             }
         }
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
+     * Handle action in the provided background thread with the provided
      * parameters.
+     *
+     * @param receiver
      */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void handleActionAlarm(ResultReceiver receiver) {
+        Log.i("AlarmService", "started");
+        String result = "";
+        int itemNum = new Random().nextInt(quotes.size());
+        int i = 0;
+        for(String quote : quotes){
+            if (i == itemNum) result = quote;
+            i++;
+        }
+        final Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_PARAM_RESULT_STRING, result);
+        receiver.send(0, bundle);
     }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+
 }
+
