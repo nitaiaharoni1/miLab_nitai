@@ -11,8 +11,8 @@ app.get('/getFile/:filename', (req, res) => {
             res.send("file not found");
             return;
         };
-	readStream.pipe(res);
 	});
+	readStream.pipe(res);
 });
 
 app.listen(app.get('port'), () =>
